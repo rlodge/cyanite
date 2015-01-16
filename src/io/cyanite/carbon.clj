@@ -41,7 +41,7 @@
 (defn format-processor
   "Send each metric over to the cassandra store"
   [chan indexch rollups insertch]
-  (dotimes [_ (+1 (.. Runtime getRuntime availableProcessors))]
+  (dotimes [_ (+ 1 (.. Runtime getRuntime availableProcessors))]
     (go
       (let [input (partition-or-time 1000 chan 500 5)]
         (while true
