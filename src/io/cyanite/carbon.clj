@@ -41,19 +41,20 @@
 (defn format-processor
   "Send each metric over to the cassandra store"
   [chan indexch rollups insertch]
-  (go
-    (let [input (partition-or-time 1000 chan 500 5)]
-      (while true
-        (let [metrics (<! input)]
-          (try
-            (doseq [metric metrics]
-              (let [formed (remove nil? (formatter rollups metric))]
-                (doseq [f formed]
-                  (>! insertch f))
-                (doseq [p (distinct (map :path formed))]
-                  (>! indexch p))))
-            (catch Exception e
-              (info "Exception for metric [" metrics "] : " e))))))))
+  (dotimes [_ (+ 1 (.. Runtime getRuntime availableProcessors))]
+    (go
+      (let [input (partition-or-time 1000 chan 500 5)]
+        (while true
+          (let [metrics (<! input)]
+            (try
+              (doseq [metric metrics]
+                (let [formed (remove nil? (formatter rollups metric))]
+                  (doseq [f formed]
+                    (>! insertch f))
+                  (doseq [p (distinct (map :path formed))]
+                    (>! indexch p))))
+              (catch Exception e
+                (info "Exception for metric [" metrics "] : " e)))))))))
 
 (defn start
   "Start a tcp carbon listener"
