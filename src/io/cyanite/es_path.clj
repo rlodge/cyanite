@@ -2,7 +2,7 @@
   "Implements a path store which tracks metric names backed by elasticsearch"
   (:require [clojure.tools.logging :refer [error info debug]]
             [clojure.string        :refer [split] :as str]
-            [io.cyanite.path :refer [Pathstore]]
+            [io.cyanite.path :refer [Pathstore brace-re]]
             [io.cyanite.util :refer [partition-or-time distinct-by
                                      go-forever go-catch]]
             [io.cyanite.es-client :as internal-client]
@@ -69,7 +69,7 @@
   "generate the filter portion of an es query"
   [path tenant leafs-only]
   (let [depth (path-depth path)
-        p (str/replace (str/replace path "." "\\.") "*" ".*")
+        p (brace-re (str/replace (str/replace path "." "\\.") "*" ".*"))
         f (vector
            {:range {:depth {:from depth :to depth}}}
            {:term {:tenant tenant}}

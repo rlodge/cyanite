@@ -11,11 +11,21 @@
   (prefixes [this tenant path])
   (lookup   [this tenant path]))
 
+(defn brace-re [s]
+  "{foo,bar,baz} -> (foo|bar|baz)"
+  (clojure.string/replace s #"\{(.*)\}"
+                            #(str "("
+                                  (clojure.string/replace (second %1) "," "|")
+                                  ")" )))
+
 (defn path-elem-re
-  "Each graphite path elem may contain '*' wildcards, this
-   functions yields a regexp pattern fro this format"
+  "Each graphite path elem may contain special syntax, this
+   functions yields a regexp pattern from this format"
   [e]
-  (re-pattern (format "^%s$" (str/replace e "*" ".*"))))
+  (re-pattern (format "^%s$"
+    (-> e
+      (str/replace "*" ".*")
+      (brace-re)))))
 
 (defn path-q
   "For a complete path query, yield a list of regexp pattern
