@@ -25,6 +25,7 @@
   (re-pattern (format "^%s$"
     (-> e
       (str/replace "*" ".*")
+      (str/replace "?" ".")
       (brace-re)))))
 
 (defn path-q

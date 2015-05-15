@@ -1,4 +1,4 @@
-(defproject io.cyanite/cyanite "0.1.3.1"
+(defproject io.cyanite/cyanite "0.1.3.2"
   :description "Alternative storage backend for graphite, backed by cassandra"
   :url "https://github.com/pyr/cyanite"
   :license {:name "MIT License"
